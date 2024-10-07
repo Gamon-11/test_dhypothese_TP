@@ -36,7 +36,11 @@ library(ggstatsplot)
 
 library(rstatix) #t_test
 library(ggstatsplot) # ggbetweenstats()
-################################################################################
+
+library(gginference)
+#' =========================================================================== #
+#' \begin{center} \bf{préparation des données} \end{center}
+#' =========================================================================== #
 
 readLines("../Data/Notes.csv",n=5)
 
@@ -66,6 +70,11 @@ dataset %>%
 # Moyenne 1 homosédatique l'écart entre l'écart-type des résultat entre les VCOD et EMS est faible
 # Moyenne 2 hétérosédatique l'écart entre l'écart-type des résultat entre les VCOD et EMS est forte
 
+################################################################################
+#
+###                           NOTE 1                                         ###
+#
+################################################################################
 
 ### Etude de la distribution des notes de l'examen 1 slon le parcours 
 
@@ -218,7 +227,7 @@ dataset %>%
   geom_violin(mapping = aes(fill = Parcours),
               alpha = 0.5,
               linetype = 1,
-              linewidth = 07,
+              linewidth = 0.7,
               bw = 0.7,
               draw_quantiles = c(0.25,0.5,0.75))+
   geom_jitter(mapping = aes(fill = Parcours),
@@ -260,9 +269,173 @@ dataset %>%
         panel.grid.minor.y = element_blank())+
   labs(title = "Distribution de la variable note 1\nen fonction du parcours",
        subtitle = "Source : Simulation",
-       x = parcours,
+       x = "Parcours",
        y = "Note à l'examen 1",
        caption = c("BUT Science des Données", "Auteur : Maxime Gamondele"))
 
-remove.packages("cli")    # Supprimer le package corrompu
-install.packages("cli")
+# Dans les deux cas, on peut noter que l’on est amené à rejeter l’hypothèse
+# nulle au profit de l’hypothèse alternative et donc à déduire de cette analyse 
+# statistique que la moyenne théorique pour le groupe EMS est significativement
+# supérieure à la moyenne théorique pour le groupe VCOD sur le premier examen.
+
+
+
+
+################################################################################
+#
+###                           NOTE 2                                         ###
+#
+################################################################################
+
+### Etude de la distribution des notes de l'examen 2 slon le parcours 
+
+dataset %>%
+  select(Parcours, Note2) %>%
+  ggdensity(x = "Note2",
+            add = "mean",
+            rug = TRUE,
+            color = "Parcours",
+            fill = "Parcours",
+            alpha = 0.3,
+            palette = c("#FF3D00", "#5C6BC0")) +
+  theme(legend.position = "bottom",
+        plot.title = element_text(hjust = 0.5,
+                                  face = "bold",
+                                  size = 15),
+        plot.subtitle = element_text(hjust = 0.5,
+                                     colour = "red4",
+                                     margin = margin(b = 10)),
+        plot.caption = element_text(hjust = c(0, 1),
+                                    face = "bold")) +
+  labs(title = "Distribution de la note de l'examen 1\nselon le type de parcours des étudiants",
+       subtitle = "Source : simulation",
+       x = "Note 2",
+       y = "Densité",
+       caption = c("BUT Science des Données", "Auteur : Maxime Gamondele"))
+# Nous observons une distribution presque unimoda chez les VCOD 
+# Chez les EMS Unimodale et symetrique la variance semble élevé
+# à vu d'oeil 
+# nous ne pouvons affirmer la normalité de la variable obsérvé
+
+# Shapiro-Wilk
+
+dataset %>% 
+  group_by(Parcours) %>% 
+  group_map(.data = .,
+            .f = ~shapiro.test(.x$Note2)) %>% 
+  setNames(nm = levels(dataset$Parcours))
+
+# Il semblerait que les deux test suivent une loi normal 
+# si nous prnons un seuil de signification de 5%
+
+
+
+# Etude des QQ-plot des notes de l'examen 2 slon le parcours 
+
+dataset %>%
+  ggplot(mapping = aes(colour = Parcours,
+                       fill = Parcours)) +
+  geom_abline(slope = 1,
+              intercept = 0,
+              linetype = 2,
+              colour = "black") +
+  stat_qq_point(mapping = aes(sample = Note2),
+                qtype = 4,
+                size = 2) +
+  stat_qq_line(mapping = aes(sample = Note2)) +
+  stat_qq_band(mapping = aes(sample = Note2),
+               colour = "white",
+               alpha = 0.2,
+               bandType = "boot") +
+  theme_bw() +
+  theme(legend.position = "bottom",
+        plot.title = element_text(hjust = 0.5,
+                                  face = "bold",
+                                  size = 15),
+        plot.subtitle = element_text(hjust = 0.5,
+                                     colour = "red4",
+                                     margin = margin(b = 10)),
+        plot.caption = element_text(hjust = c(0, 1),
+                                    face = "bold")) +
+  labs(title = "Représentation des Quantile-Quantile Plots",
+       subtitle = "Source : simulation",
+       x = "Quantiles Théoriques",
+       y = "Quantiles Empiriques",
+       caption = c("BUT Science des Données", "Auteur : Maxime Gamondele"))
+
+
+dataset %>%
+  t.test(data = .,
+         Note2 ~ Parcours,
+         paired = FALSE,
+         var.equal = TRUE)
+
+
+dataset %>% 
+  ggplot(mapping = aes(x = Parcours,
+                       y = Note2))+
+  geom_violin(mapping = aes(fill = Parcours),
+              alpha = 0.5,
+              linetype = 1,
+              linewidth = 0.7,
+              bw = 0.7,
+              draw_quantiles = c(0.25,0.5,0.75))+
+  geom_jitter(mapping = aes(fill = Parcours),
+              shape = 21,
+              size = 2,
+              width = 0.1,
+              show.legend = FALSE)+
+  stat_summary(geom = "point",
+               fun = "mean",
+               size = 2,
+               shape = 22,
+               colour = "black",
+               fill = "black",
+               show.legend = FALSE)+
+  stat_summary(geom = "line",
+               fun = "mean",
+               group = 1,
+               linewidth = 1,
+               colour = "blue",
+               show.legend = FALSE)+
+  stat_compare_means(method = "t.test",
+                     paired=FALSE,
+                     geom = "text",
+                     label.x = 0.5,
+                     label.y = 18,
+                     method.args = list(alternative = "greater",
+                                        var.equal = TRUE))+
+  scale_y_continuous(limits=c(6,18))+
+  theme_minimal()+
+  theme(legend.position = "bottom",
+        plot.title = element_text(hjust = 0.5,
+                                  face = "bold",
+                                  size = 15),
+        plot.subtitle = element_text(hjust = 0.5,
+                                     colour = "red4",
+                                     margin = margin(b=10)),
+        plot.caption = element_text(hjust = c(0,1),
+                                    face = "bold"),
+        panel.grid.minor.y = element_blank())+
+  labs(title = "Distribution de la variable note 1\nen fonction du parcours",
+       subtitle = "Source : Simulation",
+       x = "Parcours",
+       y = "Note à l'examen 1",
+       caption = c("BUT Science des Données", "Auteur : Maxime Gamondele"))
+
+
+t.test(dataset$Note1 ~ dataset$Parcours,
+       alternative = "greater",
+       paired = FALSE,
+       var.equal = TRUE) -> resu1
+
+t.test(dataset$Note2 ~ dataset$Parcours,
+       alternative = "greater",
+       paired = FALSE,
+       var.equal = TRUE) -> resu2
+
+par(mfrow=c(1,2))
+
+ggttest(resu1)
+ggttest(resu2)
+
