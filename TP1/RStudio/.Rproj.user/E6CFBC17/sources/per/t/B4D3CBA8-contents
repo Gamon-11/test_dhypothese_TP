@@ -1,0 +1,430 @@
+################################################################################
+# Titre : Mission 2
+# Auteur: GAMONDELE Maxime BELOIN Lucas
+# Date: 12/9/24
+# Données: resultats-definitifs-par-bureau-de-vote.xlsx
+################################################################################
+
+########## ---   Mission 2   --- ##########
+
+
+
+## === Installation librairies === ##
+install.packages("ggplot2")
+library(dplyr)
+library(tidyr)
+library(readxl)
+library(openxlsx)
+library(ggplot2)
+## =============================== ##
+
+
+
+
+####  =============  Lecture du fichier xlsx  =============  ####
+nom_des_feuilles = excel_sheets("Elections.xlsx")
+
+lst_df_dep = lapply(nom_des_feuilles, function(sheet) {
+  read_xlsx("Elections.xlsx", sheet = sheet)
+})
+names(lst_df_dep) = nom_des_feuilles
+####  =====================================================  ####
+
+
+
+### ============= importation des données de région =======  ####
+readLines("../Data/region_2022.csv",n=5)
+readLines("../Data/commune_2022.csv",n=5)
+
+region = read.csv(file = "../Data/region_2022.csv",
+                  sep = ",",
+                  quote = "/",
+                  header = TRUE)
+commune = read.csv(file = "../Data/commune_2022.csv",
+                   sep = ",",
+                   quote = "/",
+                   header = TRUE)
+
+glimpse(region)
+
+# Fusion pour avoir la région de chaque commune
+reg_com= merge(commune,
+               region,
+               by = "REG")
+
+reg_com = subset(reg_com,
+                 select = c("LIBELLE.x","REG","DEP","LIBELLE.y"))
+colnames(reg_com) <- c("nom_ville", "code_region", "code_dep", "nom_region")
+str(reg_com)
+
+#### A modifier GPT
+
+# lst vide
+lst_df_reg <- list()
+
+# Boucle pour classer les département par région dans la lst de df pour les reg
+for (i in seq_along(lst_df_dep)) {
+  # Extraire les deux premiers caractères du nom de l'élément
+  code_dep_from_list <- substr(names(lst_df_dep)[i], 1, 2)
+  
+  # Trouver la région correspondante dans reg_com
+  matching_region <- reg_com$nom_region[reg_com$code_dep == code_dep_from_list]
+  
+  # Si on trouve une région correspondante
+  if (length(matching_region) > 0) {
+    region_name <- matching_region[1]  # Prendre la première correspondance si plusieurs
+    
+    # Si la région n'existe pas encore dans la liste, la créer
+    if (!region_name %in% names(lst_df_reg)) {
+      lst_df_reg[[region_name]] <- lst_df_dep[[i]]  # Créer le premier data frame pour cette région
+    } else {
+      # Si la région existe déjà, on fusionne le data frame avec celui existant
+      lst_df_reg[[region_name]] <- rbind(lst_df_reg[[region_name]], lst_df_dep[[i]])
+    }
+  }
+}
+
+# Vérification du résultat
+print(names(lst_df_reg))  # Affiche les noms des régions
+
+
+str(lst_df_reg[2])
+
+
+
+################################################################################
+################################################################################
+####  ====================================================================  ####
+####.                             ANALYSE                                   ####
+####  ====================================================================  ####
+################################################################################
+################################################################################
+
+
+
+###   ----------                 Fonctions                       ---------  ####
+
+# Fonction permettant de réaliser graphique top X zones par taux xxx ###
+
+
+fonction_1 = function(top_x,numerateur,denominateur,lab_x,lab_y,titre){
+  if (lab_x == "Région") {
+    data_utilse = lst_df_reg
+  } else if (lab_x == "Département") {
+    data_utilse = lst_df_dep
+  }
+  zones = names(data_utilse)
+  taux = numeric(length(data_utilse)) 
+  
+  for (i in seq_along(data_utilse)) {
+    df = data_utilse[[i]]
+    taux[i] = sum(df[[numerateur]], na.rm = TRUE) / sum(df[[denominateur]], na.rm = TRUE)
+  }
+  
+  data_1 <- data.frame(Zone = zones, Taux = taux)
+  
+  data_1_1 <- data_1 %>%
+    arrange(desc(Taux)) %>%
+    slice(1:top_x) %>% 
+    mutate (Taux = round(Taux*100,2))
+  v_max_data_1_1 <- data_1 %>%
+    arrange(desc(Taux)) %>%
+    slice(1:1) %>% 
+    mutate (Taux = round(Taux*100,2))
+  
+  ## Graphique
+  
+  ggplot(data_1_1, aes(x = reorder(Zone, -Taux), y = Taux)) +
+    geom_bar(stat = "identity", fill = "lightblue", color = "black") +
+    labs(title = titre, 
+         x = lab_x, y = lab_y) +
+    theme_bw() +
+    geom_text(aes(label = paste0(Taux, "%")), vjust = -0.3) +
+    #ajout d'un "layer" pour faire resortir val max
+    geom_bar(data = v_max_data_1_1, aes(x = Zone, y = Taux), 
+             stat = "identity", fill = "red", color = "black") +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  
+}
+
+#______________________________________________________________________________#
+
+# Fonction permettant de réaliser graphique top X zones par taux xxx ###
+#______________________________________________________________________________#
+
+################################################################################
+#==============                    PARTIE A                 ===================# 
+################################################################################
+
+
+### ========== 1. Top 10 Départements par Taux de Participation ============ ###
+
+fonction_1(10,
+           "Nombre de votants",
+           "Nombre d’inscrits",
+           "Département",
+           "Taux de participation (%)",
+           "Top 10 des départements par taux de participation")
+
+### ========== 2. Classement des Régions par Taux de Participation ============#
+
+fonction_1(10,
+           "Nombre de votants",
+           "Nombre d’inscrits",
+           "Région",
+           "Taux de participation (%)",
+           "Top 10 des régions par taux de participation")
+
+### ========== 3. Top 10 Départements par Taux d’Abstention ===================#
+
+fonction_1(10,
+           "Nombre d’abstentions",
+           "Nombre d’inscrits",
+           "Département",
+           "Taux d'abstention (%)",
+           "Top 10 des départements par taux d'abstention")
+       
+
+### ========== 4. Classement des Régions par Taux d’Abstention ================#
+
+fonction_1(10,
+           "Nombre d’abstentions",
+           "Nombre d’inscrits",
+           "Région",
+           "Taux d'abstention (%)",
+           "Top 10 des régions par taux d'abstention")
+
+### ========== 5. Top 10 Départements par Taux de Votes Nuls ==================#
+
+fonction_1(10,
+           "Nombre de votes nuls",
+           "Nombre de votants",
+           "Département",
+           "Taux de votes nuls (%)",
+           "Top 10 des départements par taux de votes nuls")
+       
+
+### ========== 6. Classement des Régions par Taux de Votes Nuls ===============#
+
+fonction_1(10,
+           "Nombre de votes nuls",
+           "Nombre de votants",
+           "Région",
+           "Taux de votes nuls (%)",
+           "Top 10 des régions par taux de votes nuls")
+
+### ========== 7. Top 10 des Listes par Nombre de Votes =======================#
+
+#Initialisation d'un dataframe 
+resultats_totaux <- data.frame(Liste = character(), Nombre_de_votes = numeric())
+
+# Boucle sur permetant de calculer les taux sur toutes les listes (liste 1 commence à collonne 10)
+for (i in seq_along(lst_df_dep)) {
+  colonnes_liste <- lst_df_dep[[i]][, 10:ncol(lst_df_dep[[i]])]
+  nbr_vot <- sum(lst_df_dep[[i]]$`Nombre de votants`, na.rm = TRUE)
+  nbr_vot_par_liste <- colSums(colonnes_liste)
+  df_temp <- data.frame(Liste = colnames(colonnes_liste), Nombre_de_votes = nbr_vot_par_liste)
+  resultats_totaux <- rbind(resultats_totaux, df_temp)
+}
+
+# Agréger les résultats totaux par liste
+resultats_totaux <- resultats_totaux %>%
+  group_by(Liste) %>%
+  summarise(Nombre_de_votes = sum(Nombre_de_votes, na.rm = TRUE)) %>%
+  arrange(desc(Nombre_de_votes))
+print(resultats_totaux)
+
+# Prendre les 10 premières listes
+resultats_totaux <- resultats_totaux %>% slice(1:10)
+print(resultats_totaux)
+max_res_tot <- resultats_totaux %>% arrange(desc(Nombre_de_votes)) %>%slice(1:1)
+
+# Graphique
+ggplot(resultats_totaux, aes(x = reorder(Liste, -Nombre_de_votes), y = Nombre_de_votes)) + 
+  geom_bar(stat = "identity", fill = "lightblue", color = "black") + 
+  labs(title = "Top 10 des listes par nombre total de votes", 
+       x = "Liste", y = "Nombre de votes (en millions)") + 
+  theme_bw() + 
+  geom_text(aes(label = Nombre_de_votes), vjust = -0.3) + 
+  geom_bar(data = max_res_tot, aes(x = Liste, y = `Nombre_de_votes`), 
+           stat = "identity", fill = "red", color = "black") +
+  scale_y_continuous(labels = function(x) format(x/1000000, big.mark = " ", scientific = FALSE))+ #### A VERIFIER
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+
+### ========== 8. Présentation d’une Carte de France : Pourcentage de Votes ===# 
+### ==========    par Région pour la Liste des Écologistes                  ===#
+#
+
+### ========== 9. Top 5 des Listes par Nombre de Votes : Répartition en =======# 
+### ==========    Pourcentage des Votes par Région                     ========#
+
+# Créer une liste vide pour stocker les dataframes temporaires
+lst_resultat_reg <- list()
+
+# Boucle sur chaque dataframe de la liste lst_df_reg
+for (i in seq_along(lst_df_reg)) {
+  # Nom de la région correspondant à ce dataframe
+  region_name <- names(lst_df_reg)[i]
+  
+  # Extraction des colonnes contenant les listes de votes
+  colonnes_liste <- lst_df_reg[[i]][, 10:ncol(lst_df_reg[[i]])]
+  
+  # Calcul du nombre de votes par liste
+  nbr_vot_par_liste <- colSums(colonnes_liste)
+  
+  # Création d'un dataframe temporaire avec les noms des listes et leurs votes
+  df_temp <- data.frame(Liste = colnames(colonnes_liste), Nombre_de_votes = nbr_vot_par_liste)
+  
+  # Filtrer le Top 5 des listes par nombre de votes décroissant
+  df_temp <- df_temp[order(-df_temp$Nombre_de_votes), ][1:5, ]
+  
+  # Stocker df_temp dans la liste en lui donnant un nom correspondant à la région
+  lst_resultat_reg[[region_name]] <- df_temp
+  
+  # Affichage pour vérifier
+  print(df_temp)
+}
+
+
+# Créer un dataframe vide pour stocker les résultats
+df_combined <- data.frame()
+
+# Boucle pour ajouter une colonne 'Région' et combiner les dataframes
+for (region_name in names(lst_resultat_reg)) {
+  df_temp <- lst_resultat_reg[[region_name]]
+  df_temp$Région <- region_name  # Ajouter une colonne 'Région'
+  df_combined <- rbind(df_combined, df_temp)  # Combiner avec le dataframe principal
+}
+
+str(df_combined)
+
+df_max <- df_combined %>%
+  group_by(Région) %>%
+  filter(Nombre_de_votes == max(Nombre_de_votes)) %>%
+  ungroup()
+
+# Créer le graphique principal
+ggplot(df_combined, aes(x = reorder(Liste, -Nombre_de_votes), y = Nombre_de_votes)) + 
+  geom_bar(stat = "identity", fill = "lightblue", color = "black") + 
+  
+  # Afficher les étiquettes (en milliers)
+  geom_text(aes(label = round(Nombre_de_votes/1000)), vjust = -0.3) +    
+  # Diviser l'axe Y par 1000 pour afficher les milliers
+  labs(title = "Top 5 des listes par Région", x = "Liste", y = "Nombre de votes (en milliers)") + 
+  scale_y_continuous(labels = scales::comma_format(scale = 1/1000, big.mark = " ", suffix = "")) +  
+  
+  # Ajouter la couche pour les valeurs maximales
+  geom_bar(data = df_max, aes(x = Liste, y = Nombre_de_votes), fill = "red", color = "lightblue", stat = "identity") + 
+  
+  theme_bw() + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) + 
+  
+  # Facet_wrap pour afficher par région
+  facet_wrap(~ Région, nrow = 2, ncol = 6)
+
+
+
+### ========== 10. Départements où le Pourcentage de Votes pour la Liste RN ===#
+### ==========     est Deux Fois Supérieur au Pourcentage de Votes pour la ====#
+### ==========     Liste LFI                                               ====#
+
+lst_df_RN_LFI = list()  # Initialisation de la liste vid
+for (i in seq_along(lst_df_dep)) {
+  somme_lfi = sum(lst_df_dep[[i]]$`Nombre de votes pour la liste 4`)*2
+  somme_rn = sum(lst_df_dep[[i]]$`Nombre de votes pour la liste 5`)
+  
+  # Afficher les sommes pour chaque itération
+  print(paste("Iteration:", i, "Somme LFI:", somme_lfi, "Somme RN:", somme_rn))
+  
+  if (somme_lfi  < somme_rn) {
+    print(paste("Ajout de l'élément", i, "car", somme_lfi , "<", somme_rn))
+    lst_df_RN_LFI[[length(lst_df_RN_LFI) + 1]] = lst_df_dep[[i]]
+    names(lst_df_RN_LFI)[length(lst_df_RN_LFI)] = names(lst_df_dep)[i] # Véridier
+  }
+}
+length(lst_df_dep)
+length(lst_df_RN_LFI)
+
+
+
+
+taux_1 = numeric(length(lst_df_RN_LFI)) 
+taux_2 = numeric(length(lst_df_RN_LFI)) 
+
+for (i in seq_along(lst_df_RN_LFI)) {
+  df = lst_df_RN_LFI[[i]]
+  taux_1[i] = sum(df[["Nombre de votes pour la liste 5"]], na.rm = TRUE) / sum(df[["Nombre de votants"]], na.rm = TRUE)
+  taux_2[i] = sum(df[["Nombre de votes pour la liste 4"]], na.rm = TRUE) / sum(df[["Nombre de votants"]], na.rm = TRUE)
+  
+}
+
+data_1 <- data.frame(Zone = names(lst_df_RN_LFI), Taux_RN = taux_1, Taux_LFI = taux_2)
+
+
+
+data_1 <- data_1 %>%
+  mutate(Spread = Taux_RN - Taux_LFI) %>% 
+  arrange(desc(Spread)) %>%
+  mutate (Taux_RN = round(Taux_RN*100,2),
+          Taux_LFI = round(Taux_LFI*100,2)) 
+
+v_max_data_1 <- data_1 %>%
+  arrange(desc(Taux_RN-Taux_LFI)) %>%
+  slice(1:1)
+
+str(data_1)
+
+
+
+
+
+################################################################################
+#==============                    PARTIE B                 ===================# 
+################################################################################
+
+
+
+### ==========  1. Classement des départements Normands selon le taux de    ===#
+### ==========     participation                                            ===#
+
+### ==========  2. Présentation d’une carte de Normandie faisant apparaître ===#
+### ==========     par département l’indicateur taux de participation par   ===#
+### ==========     département                                              ===#
+
+### ==========  3. Classement des départements Normands selon le taux       ===#
+### ==========     d’abstention                                             ===#
+
+### ==========  4. Présentation d’une carte de Normandie faisant apparaître ===#
+### ==========     par département l’indicateur taux d’abstention par       ===#
+### ==========     département                                              ===#
+
+### ==========  5. Classement des départements Normands selon le taux de    ===#
+### ==========     votes nuls                                               ===#
+
+### ==========  6. Présentation d’une carte de Normandie faisant apparaître ===#
+### ==========     par département l’indicateur taux de votes nuls par      ===#
+### ==========     département                                              ===#
+
+### ==========  7. Sélection en Normandie du top 5 des listes selon le      ===#
+### ==========     nombre de votes, puis représentation de la répartition   ===#
+### ==========     en pourcentage des votes selon ces listes en fonction    ===#
+### ==========     du département                                           ===#
+
+### ==========  8. Sélection des 5 listes présentant le nombre de votes le  ===#
+### ==========     plus important en Normandie, puis représentation de la   ===#
+### ==========     répartition en pourcentage des votes selon le            ===#
+### ==========     département en fonction de ces listes.
+
+### ==========  9. Sélection des 5 listes présentant le nombre de votes le  ===#
+### ==========     plus important en Normandie, puis présentation d’une     ===#
+### ==========     unique illustration faisant                              ===# 
+
+### ========== 10. Top 10 des communes du Calvados de plus de 1000          ===#
+### ==========     habitants avec un taux de participation de plus de 50%   ===#
+### ==========     selon le nombre de votes pour la liste socialiste        ===#
+
+
+
+

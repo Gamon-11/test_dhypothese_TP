@@ -1,0 +1,326 @@
+\documentclass[10pt]{article}
+\usepackage{mathtools, amsfonts, amssymb, amsthm}
+							%pour écrire des maths
+ 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ----- Gestion des librairies ----- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage[a4paper,text={18cm,26cm},centering]{geometry}
+\usepackage[french]{babel}
+
+
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage[colorlinks = TRUE]{hyperref}
+\usepackage{array}
+
+
+%\usepackage[font=small,labelfont=bf,labelsep="-"]{caption}
+\usepackage{caption}
+\DeclareCaptionLabelFormat{mylabel}{#1 #2.\hspace{1.5ex}}
+\captionsetup[figure]{labelformat=mylabel, labelsep=none, name=Fig.}
+%\captionsetup{figurename=Fig.,tablename=tab.}
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ----- Début du document ----- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\pagenumbering{arabic}
+\thispagestyle{empty}
+
+
+\begin{tabular}{m{0.2\textwidth}m{0.52\textwidth}m{0.1\textwidth} }
+\includegraphics[scale=0.70]{Images/Logo/logo-univ} & \centering {\LARGE \bf Université de Caen \\[0.3cm] Normandie}  & \includegraphics[scale=0.55]{Images/Logo/logo-iut}
+\end{tabular}
+
+\vspace{1.5cm}
+
+\begin{center}
+\centering{\Huge \bf IUT Grand Ouest Normandie}
+
+\vspace{1.5cm}
+
+{\LARGE Bachelor Universitaire de Technologie}
+
+\vspace{0.2cm}
+
+{\LARGE \bf Science des Données}
+
+\vspace{0.3cm}
+
+{\Large \tt Campus de Lisieux}
+\end{center}
+
+\vspace{1cm}
+
+\begin{center}
+{\Large \bf Science des Données 2 - Ressource 3.06}
+
+\vspace{0.5cm}
+
+{\LARGE \bf Tests d’hypothèses}
+
+\vspace{1cm}
+
+\begin{center}
+\rule{0.5\textwidth}{1pt}
+\end{center}
+
+{\Large \bf Thématique}
+
+\vspace{0.5cm}
+
+\textcolor{blue}{\LARGE \bf Étude sur les personnes en situation d’obésité} 
+
+\begin{center}
+\rule{0.5\textwidth}{1pt}
+\end{center}
+
+\vspace{0.5cm}
+
+
+\vspace{0.7cm}
+
+\underline{\large \bf Auteurs}
+
+\vspace{0.2cm}
+
+{\large \tt GAMONDELE Maxime}\\
+\end{center}
+
+\vspace{4.7cm}
+
+\begin{center}
+{\large Année universitaire 2023-2024}
+\end{center}
+
+
+
+%%%%%%%%%%%%%%%%%
+\newpage
+%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ----- Début Sommaire ----- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\tableofcontents
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ----- Fin Sommaire ----- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%
+\newpage
+%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ----- Début Introduction ----- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\section*{Introduction}
+\addcontentsline{toc}{section}{Introduction}
+
+À travers cette étude, nous étudions un régime à base de fibres et un échantillons d'une population en surpoids. Dans le premier cas, nous utilisons une approche paramétrique, tandis que dans le second, nous adoptons une approche non paramétrique. Pour l'approche paramétrique, la distribution de notre population suit une loi connue, alors que dans l'approche non paramétrique, nous ne connaissons pas la loi que suit la distribution.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ----- Fin Introduction ----- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%     PARTIE 1  %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%
+\newpage
+%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%-----      EXO 1       ----------%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Étude du régime} 
+
+À travers cette première partie, nous cherchons à tester quelle hypothèses conserver, avec H_0$ : le poids reste identique avec le régime et H_1$ : Le poids diminue avec le régime.
+
+\subsection{Analyse exploratoire} 
+
+
+Premièrement, afin d'avoir une idée de la distribution de notre échantillons, nous réalison la densité lissé de la variable Poids (cf. Fig.~\ref{lisee}). Nous observons une cloche avec une légère dysymétrie. Nous décidons d'évaluer la possibilité que notre population suit une loi de Lapace-Gauss.
+
+\begin{center}
+\fbox{{
+\includegraphics[scale=0.55]{Images/Partie_1/Représentation de la densité lissée de la variable Poids.pdf}}}
+\captionof{figure}{Histogramme}\label{lisee}
+\end{center}   
+
+Afin d'avoir plus d'information sur la distribution, nous décidons de représenter le graphique des Q-Q plot (cf. Fig.~\ref{qq_plot1}). Cette méthodes nous permet de comparé les quantiles théorique de la loi normal avec les quantilles obsérvé de notre variable ici le poids. On constate que les points semble se rapproché de la droite rouge, ce qui veut dire que notre population suit probalement une loi normal.
+
+\begin{center}
+\fbox{{
+\includegraphics[scale=0.55]{Images/Partie_1/Q-Q plot pour la variable poids.pdf}}}
+\captionof{figure}{Valeurs centrées réduites}\label{qq_plot1}
+\end{center}   
+\newpage
+
+
+Aprés avoir visualiser nos deux graphique nous avons toujours un léger doutes sur la loi que pourait suivre notre échantillons de ce fait nous utilisons une approche plus objective avec un test de normalité de Shapiro-Wilk dont les hypothèses sont les suivantes :
+H_0$ : la distribution de X est gaussienne versus H_1$ : la distribution de X n’est pas gaussienne(cf. Fig.~\ref{quantth}). Avec les résultat obtenues nous pouvons afirmer que la distribution du poids semble suivre une loi de laplace gause avec pour W 0.95 et une p value de 0.192.
+
+\begin{center}
+\includegraphics[scale=0.5]{Images/Partie_1/test.png}
+\captionof{figure}{Résultat test de normalité}\label{quantth}
+\end{center}   
+
+\subsection{Test} 
+
+Maintenant que l'hypotèsde de normalité de la distribution de la variable poids est validée, nous pouvons mettre en œuvre le test d’hypothèses d’intérêt selon un cadre paramétrique. Ci dessous notre sortie graphique nous montre que nous pouvons rejeté l'hypothèse H_0$, car notre valeur T_obs$ est inférieur à notre valuer critique -t_1-α$ (cf. Fig.~\ref{zone de rejet}). On observe que notre T_obs$ est dans la zone de rejet avec une p-value quasi égale à 0 (cf. Fig.~\ref{res}). Donc rejet de H_0$.
+
+\begin{center} 
+\fbox{{
+\includegraphics[scale=0.55]{Images/Partie_1/zone_de_rejet.pdf}}}
+\captionof{figure}{Zone de rejet}\label{zone de rejet}
+\end{center}   
+\vspace{0.8cm}
+\begin{center} 
+\includegraphics[scale=0.8]{Images/Partie_1/res.png}
+\captionof{figure}{Résultats Mean.test}\label{res}
+\end{center}   
+
+\vspace{0.5cm}
+
+Pour conclure, nous pouvons affirmer que le régime à base de fibre pendant 6 mois permet une perte de poids. 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%-----      EXO 2       ----------%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\section{Étude du poids} 
+
+À travers cette partie, nous étudions le poids d'une population à travers un échantillons de 40 individus. Nous cherchons à confronté nos hypothèse suivantes : H_0$ : le poids moyen de notre population est égal à 100 kg H_1$ : le poids moyen de notre population est supérieur à 100 kg.
+
+\subsection{Analyse d'un échantillons de notre population}
+
+Premièrement, on propose d'étudier la densité lissé notre variable d'interet (Poids). On visualise une cloche néanmoins ce n'est pas assée pour dire que notre distribution suit une loi de laplace-Gause (cf. Fig.~\ref{dist}). 
+
+
+\begin{center}
+\includegraphics[scale=0.55]{Images/Partie_2/Représentation de la densité lissée de la variable Poids.pdf}
+\captionof{figure}{Échantillon n°1}\label{dist}
+\end{center}   
+
+De ce fait on décide de visualiser le Q-Q plot (cf. Fig.~\ref{qq_plot2}). On remarque que nos points sempble s'aligner d'une droit ce qui veut dire que notre échantillons se rapproche d'une loi normal.
+
+\begin{center}
+\includegraphics[scale=0.45]{Images/Partie_2/Q-Q plot pour la variable poids.pdf}
+\captionof{figure}{Échantillon n°2}\label{qq_plot2}
+\end{center} 
+
+Et enfin on effectue le test de normalité de de Shapiro-Wilk qui nous donne les résultats suivant (cf. Fig.~\ref{Shapiro}). Ici, les résultats du test de Shapiro-Wilk suggèrent que notre échantillon n'est pas normalement distribuées au niveau de signification de 5\%. De ce fait nous rejetons l'hypothése H_0.
+
+
+\begin{center}
+\includegraphics[scale=0.45]{Images/Partie_2/Shapiro}
+\captionof{figure}{Échantillon n°2}\label{Shapiro}
+\end{center} 
+
+Ètant donné que notre échantillon ne suit pas une loi normal nous allons utilisé l’approche non paramétrique qui utilise le Théorème de la Limite Centrale. (cf. Fig.~\ref{TCL}). Notre statistique W = 1.408 de ce fait elle est inférieure à la valeur critique qui elle est de 1.644854. Etant donné que nous somme dans un test unilateral à droite la statistique de test n'atteint pas la zone de rejet de l'hypothèse nulle. La p-valeur de 0.0795 supérieure à α qui lui est égal à 0.05. Cela signifie qu'il n'y a pas suffisamment de preuves pour rejeter l'hypothèse nulle à un niveau de signification de 5 \%. 
+
+\begin{center}
+\includegraphics[scale=0.55]{Images/Partie_2/TCL.png}
+\captionof{figure}{Échantillon n°2}\label{TCL}
+\end{center} 
+
+Nous proposons une alternative à ce test d'hypothèse. Au vu de la taille de notre échantillon (n=40) on se propose d'aproximer nos résultat à l'aide de la loi gausienne, car notre échantillons est suffisament grand (n>30). On se propse donc de faire un t-test où l'on obtin les résultat ci dessous (cf. Fig.~\ref{t_test}). 
+
+\begin{center}
+\includegraphics[scale=0.45]{Images/Partie_2/t_test.png}
+\captionof{figure}{Échantillon n°2}\label{t_test}
+\end{center} 
+
+
+De ce fait nous pouvons conclure que la moyenne théorique est bien égale à 100 kg.
+
+
+
+
+%%%%%%%%%%%%%%%%%
+\newpage
+%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ----- Début Conclusion ----- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\section*{Conclusion}
+\addcontentsline{toc}{section}{Conclusion}
+
+Dans le cadre du première éxercice, notre objectif était de déterminer la distribution de probabilité la mieux adaptée à notre échantillon. En utilisant des outils tels qu'un histogramme et un Q-Q plot, nous avons procédé à cette évaluation. Nos résultats ont abouti à la conclusion que la loi normale est celle qui représente le mieux notre échantillon.
+
+\vspace{0.3cm}
+
+Dans le cadre du second exercice, notre objectif était de déterminer les distributions de probabilité les mieux adaptées à chaque échantillon. En utilisant la même méthodologie, nous avons entrepris cette recherche. Les résultats de nos investigations ont abouti à l'identification des distributions suivantes : pour l'échantillon n°1 la loi exponentielle , pour l'échantillon n°2 la loi uniforme , pour l'échantillon n°3 la loi gaussienne et enfin, pour l'échantillon n°4, la loi lognormale.
+
+
+\vspace{0.3cm}
+
+À travers le troisième exercice, on s'est demandé si la taille de l'échantillon avais une influence sur la qualité de l'estimateur. D'après nos simulations, on se rend compte que pour un échantillon trop petit, le sommet de la courbe de densité est proche de la statistique de la population, mais la distribution est asymétrique. On a aussi remarqué que quand la taille de l'échantillon était trop grande, ici 50, le sommet de la courbe de densité était éloigné de la vraie moyenne, mais avec une distribution presque symétrique. On peut donc proposer une l'hypothèse qu'il faut que l'échantillon soit supérieur ou égal à 10, mais inférieur à 50 afin d'avoir une estimation la plus proche de la réalité.
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ----- Fin Conclusion ----- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%
+\newpage
+%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ----- Début Annexes ----- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+
+
+%%%%%%%%%%%%%%
+\newpage
+%%%%%%%%%%%%%%
+
+\addcontentsline{toc}{section}{\listfigurename}
+\listoffigures
+%\addcontentsline{toc}{section}{\listtablename}
+%\listoftables
+
+\end{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ----- Fin Document ----- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+
+
+
+
