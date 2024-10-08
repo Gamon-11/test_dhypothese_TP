@@ -148,7 +148,40 @@ global.data|>
        y = "Densité",
        caption = c("BUT Science des Données", "Auteur : Maxime Gamondele"))
 
+#' Test de Shapiro-Wilk
+
+global.data |>
+  select(diff) |>
+  map(.f = ~ .x |> shapiro.test())
+
+global.data |>
+  shapiro_test(diff)
+
+global.data |>
+  select(diff) |>
+  map(.f = ~ .x |>
+        shapiro_test()|>
+        mutate(variable = NULL)) |>
+  bind_rows(.id = "Variable")
 
 
+#' Test de comparaison de moyenne appairé - paired = TRUE
 
+t.test(formula = data$weight ~data$Treatment,
+       alternative = "greater",
+       paired = TRUE)
 
+data |>
+  t_test(formula = weight ~ Treatment,
+         alternative = "greater",
+         mu = 0,
+         paired = TRUE,
+         detailed = TRUE) |>
+  mutate(statistic = num(statistic,digits = 3))
+
+#' Utilisation de la librairie gginference
+
+t.test(formula = data$weight ~ data$Treatment,
+       alternative = "greater",
+       paired = TRUE) -> test
+ggttest(test)

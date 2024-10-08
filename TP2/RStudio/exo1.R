@@ -38,7 +38,9 @@ library(rstatix) #t_test
 library(ggstatsplot) # ggbetweenstats()
 
 library(gginference)
-################################################################################
+#' =========================================================================== #
+#' \begin{center} \bf{préparation des données} \end{center}
+#' =========================================================================== #
 
 readLines("../Data/Notes.csv",n=5)
 
@@ -65,8 +67,8 @@ dataset %>%
                       na.rm = TRUE))
 
 # Oui, car nos moyennnes coïncides avec notre hypothèse alternative soit moyenne EMS > moyenne VCOD
-# Moyenne 1 homosédatique l'écart entre l'écart-type des résultat entre les VCOD et EMS est faible
-# Moyenne 2 hétérosédatique l'écart entre l'écart-type des résultat entre les VCOD et EMS est forte
+# Note examen 1 homosédatique l'écart entre l'écart-type des résultat entre les VCOD et EMS est faible
+# Note examen 2 hétérosédatique l'écart entre l'écart-type des résultat entre les VCOD et EMS est forte
 
 ################################################################################
 #
@@ -148,13 +150,14 @@ dataset %>%
        y = "Quantiles Empiriques",
        caption = c("BUT Science des Données", "Auteur : Maxime Gamondele"))
 
-# REPONDRE à l'elesticité.
+# les droitent semblent parallelle donc homosédastique.
 
 dataset %>% 
   levene_test(formula = Note1 ~Parcours,
               center = median)
 # Avec un niveu de signifiaction à 5% et un p-value à 0,954 on peut dire que la 
 # variance des note de l'examen 1 des 2 parcours est significativement identiques.
+# Soit homoscédastique
 
 
 dataset %>%
@@ -361,7 +364,7 @@ dataset %>%
        y = "Quantiles Empiriques",
        caption = c("BUT Science des Données", "Auteur : Maxime Gamondele"))
 
-
+# leger croisemment des droites non parallele de ce fait on supose que les notes sont hétéroscédatiques
 dataset %>%
   t.test(data = .,
          Note2 ~ Parcours,
